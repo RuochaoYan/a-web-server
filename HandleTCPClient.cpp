@@ -103,6 +103,60 @@ bool worldReadable(char const *file){
     }
 }
 
+void requestProcessing(HttpRequest req, int clntSocket, HttpFramer framer, string doc_root){
+    // translate "GET /" to "GET /index.html"
+    if(req.url == "/")
+        req.url += "index.html";
+    
+    // convert relative path to absolute path
+    string beforeConvert = doc_root + req.url;
+    char afterConvert[80];
+    realpath(beforeConvert.c_str(), afterConvert);
+    
+    // define "response"
+    HttpResponse response;
+    response.url = string(afterConvert);
+    response.version = "HTTP/1.1";
+    
+    // check if the headers are valid - 400
+    for(auto it = req.headers.cbegin(); it != req.headers.cend(); it++){
+        if(it->first[it->first.size()-1] != ':'){
+            response.status_code = 400;
+            prepareResponse(clntSocket, response, framer);
+        }
+    }
+    
+    // other status code
+    if(response.status_code != 400){
+        // check if the initial line is valid
+        if(req.url.size() == 0 || req.version.size() == 0){
+            response.status_code = 400;
+        }
+        // check if it is a malformed url - 404
+        else if(response.url.compare(0, doc_root.size(), doc_root)){
+            response.status_code = 404;
+        }
+        
+        // check if the file exists - 404
+        else if(!is_file_exist(response.url.c_str())){
+            response.status_code = 404;
+        }
+        
+        // check if the file is world readable - 403
+        else  if(!worldReadable(response.url.c_str())){
+            response.status_code = 403;
+        }
+        
+        // successful - 200
+        else{
+            response.status_code = 200;
+        }
+        prepareResponse(clntSocket, response, framer);
+    }
+    if(req.headers["Connection:"] == "close")
+        close(clntSocket);    /* Close client socket */
+}
+
 void HandleTCPClient(int clntSocket, string doc_root)
 {
     char buffer[BUFSIZE];
@@ -142,7 +196,7 @@ void HandleTCPClient(int clntSocket, string doc_root)
         }
       }
       if(hasFinished)
-          break;
+          requestProcessing(req, clntSocket, framer, doc_root);
       numBytesRcvd = recv(clntSocket, buffer, BUFSIZE - 1, 0);
       if (numBytesRcvd < 0)
         DieWithError("recv() failed");
@@ -150,56 +204,6 @@ void HandleTCPClient(int clntSocket, string doc_root)
       s = buffer;
 
     }
-    // translate "GET /" to "GET /index.html"
-    if(req.url == "/")
-        req.url += "index.html";
-    
-    // convert relative path to absolute path
-    string beforeConvert = doc_root + req.url;
-    char afterConvert[80];
-    realpath(beforeConvert.c_str(), afterConvert);
 
-    // define "response"
-    HttpResponse response;
-    response.url = string(afterConvert);
-    response.version = req.version;
-    
-    // check if the headers are valid - 400
-    for(auto it = req.headers.cbegin(); it != req.headers.cend(); it++){
-        if(it->first[it->first.size()-1] != ':'){
-            response.status_code = 400;
-            prepareResponse(clntSocket, response, framer);
-        }
-    }
-    
-    // other status code
-    if(response.status_code != 400){
-        // check if the initial line is valid
-        if(req.url.size() == 0 || req.version.size() == 0){
-            response.status_code = 400;
-        }
-        // check if it is a malformed url - 404
-        else if(response.url.compare(0, doc_root.size(), doc_root)){
-            response.status_code = 404;
-        }
-        
-        // check if the file exists - 404
-        else if(!is_file_exist(response.url.c_str())){
-            response.status_code = 404;
-        }
-        
-        // check if the file is world readable - 403
-        else  if(!worldReadable(response.url.c_str())){
-            response.status_code = 403;
-        }
-        
-        // successful - 200
-        else{
-            response.status_code = 200;
-        }
-        prepareResponse(clntSocket, response, framer);
-    }
-
-//    if(req.headers["Connection:"] == "close")
     close(clntSocket);    /* Close client socket */
 }
