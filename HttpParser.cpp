@@ -3,26 +3,28 @@
 #include <sstream>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 // TO modify and impl
 
-pair<string, string> HttpParser::parse(std::string insstr)
+vector<string> HttpParser::parseRequest(string insstr)
 {
-        pair<string, string> p;
+    vector<string> v;
+    stringstream ss(insstr);
+    string item;
+    getline(ss, item, ' ');
+    v.push_back(item);
+    getline(ss, item, ' ');
+    v.push_back(item);
+    if(v[0] == "GET"){
+        getline(ss, item, ' ');
+        v.push_back(item);
+    }
+    return v;
+}
 
-        if (insstr.size() == 0) {
-          p.first = "end";
-	}
-        else {
-	  stringstream ss(insstr);
-          string item;
-          getline(ss, item, ' ');
-          p.first = item;
-          getline(ss, item, ' ');
-          p.second = item;
-        }
-
-	return p;
+string HttpParser::parseResponse(string key, string value){
+    return key + ' ' + value + "\r\n";
 }
