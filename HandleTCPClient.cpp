@@ -174,8 +174,12 @@ void HandleTCPClient(int clntSocket, string doc_root)
     
     // other status code
     if(response.status_code != 400){
+        // check if the initial line is valid
+        if(req.url.size() == 0 || req.version.size() == 0){
+            response.status_code = 400;
+        }
         // check if it is a malformed url - 404
-        if(response.url.compare(0, doc_root.size(), doc_root)){
+        else if(response.url.compare(0, doc_root.size(), doc_root)){
             response.status_code = 404;
         }
         
