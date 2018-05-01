@@ -38,7 +38,7 @@ void prepareResponse(int socket, HttpResponse response, HttpFramer framer){
     
     // the headers of the response
     // server
-    framer.addResponse("XX server\r\n");
+    framer.addResponse("Server: Potato1.0\r\n");
     bool fileExists = response.status_code == 200 ? true : false;
     if(fileExists){
         // last modified date
@@ -165,7 +165,7 @@ void HandleTCPClient(int clntSocket, string doc_root)
     response.version = req.version;
     
     // check if the headers are valid - 400
-    for(auto it = req.headers.begin(); it != req.headers.cend(); it++){
+    for(auto it = req.headers.cbegin(); it != req.headers.cend(); it++){
         if(it->first[it->first.size()-1] != ':'){
             response.status_code = 400;
             prepareResponse(clntSocket, response, framer);

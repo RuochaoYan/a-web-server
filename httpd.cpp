@@ -8,11 +8,19 @@
 #include <unistd.h>     /* for close() */
 #include "HandleTCPClient.h"
 #include "DieWithError.h"
+#include <pthread.h>
 
 #define MAXPENDING 5    /* Maximum outstanding connection requests */
 
 
 using namespace std;
+
+void *ThreadMain(void *arg);
+
+struct ThreadArgs {
+  int clntSock;
+  string doc_root;
+};
 
 void start_httpd(unsigned short port, string doc_root)
 {
@@ -54,7 +62,29 @@ void start_httpd(unsigned short port, string doc_root)
 
         printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
-        HandleTCPClient(clntSock, doc_root);
+        struct ThreadArgs *threadArgs = (struct ThreadArgs *) malloc(sizeof(struct ThreadArgs));
+        if (threadArgs == NULL)
+          DieWithError("malloc() failed");
+        threadArgs->clntSock = clntSock;
+        threadArgs->doc_root = doc_root;
+
+	pthread_t threadID;
+        int returnValue = pthread_create(&threadID, NULL, ThreadMain, threadArgs);
+        if (returnValue != 0)
+          DieWithError("pthread_create() failed");
+	printf("with thread %lu\n", (unsigned long int) threadID);
     }
     /* NOT REACHED */
+}
+
+void *ThreadMain(void *threadArgs) {
+  pthread_detach(pthread_self());
+
+  int clntSock = ((struct ThreadArgs *) threadArgs)->clntSock;
+  string doc_root = ((struct ThreadArgs *) threadArgs)->doc_root;
+  free(threadArgs);
+
+  HandleTCPClient(clntSock, doc_root);
+
+  return (NULL);
 }

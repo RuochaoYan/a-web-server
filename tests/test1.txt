@@ -1,2 +1,2 @@
-GET /b
+GET a.cpp
 Host: et
