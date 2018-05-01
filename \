@@ -1,0 +1,60 @@
+handleClient {
+string s = recv()
+HttpRequest request
+framer.append(s)
+
+while numOfRecv > 0 {
+  while framer.hasNext {
+    string line = framer.pop
+    if line.length == 0
+      break;
+    vector<string> v = Parser::parseRequest(line)
+    if v.size == 3 {
+    }
+    else if v.size == 2 {
+    }
+    else {
+      // error
+    }
+  }
+}
+HttpResponse response
+
+for (auto it = request.headers.begin(); ;) {
+  if it->first[it->first.size - 1] != ':'
+    response.status_code = 400
+    return prepareResponse(socket, response)
+}
+
+check whether the file exists
+if (404)
+  response.status_code = 404
+  return prepareResponse(socket, response)
+
+check whether having the permission
+if (403) 
+  reponse.status_code = 403
+  return prepareResponse(socket, response)
+
+
+reponse.status_code = 200
+return prepareResponse(socket, response)
+}
+
+struct HttpRequest {
+  string method
+  string URL
+  string version
+  map<string ,string>
+}
+
+struct HttpResponse {
+  int status_code
+  string URL
+}
+
+prepareResponse() {
+string parser.parseResponse(string s, string t)
+void framer.addResponse(string s)
+void framer.sendResponse(string url, int socket)
+}

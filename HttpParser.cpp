@@ -1,13 +1,14 @@
 #include <assert.h>
-#include "CalcParser.hpp"
+#include "HttpParser.hpp"
 #include <sstream>
 #include <iostream>
 #include <string>
-#include <utility>
 
 using namespace std;
 
-pair<string, string> CalcParser::parse(std::string insstr)
+// TO modify and impl
+
+pair<string, string> HttpParser::parse(std::string insstr)
 {
         pair<string, string> p;
 

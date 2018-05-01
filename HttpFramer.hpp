@@ -1,5 +1,5 @@
-#ifndef CALCFRAMER_HPP
-#define CALCFRAMER_HPP
+#ifndef HTTPFRAMER_HPP
+#define HTTPFRAMER_HPP
 
 #include <iostream>
 #include <queue>
@@ -7,7 +7,7 @@
 
 using namespace std;
 
-class CalcFramer {
+class HttpFramer {
 public:
 	void append(std::string chars);
 
@@ -23,9 +23,16 @@ public:
 	// prints the string to an ostream (useful for debugging)
 	void printToStream(std::ostream& stream) const;
 
+	// a line of response header
+	void addResponse(string line);
+
+	// send header and/or file
+        void sendResponse(string url, int socket, bool fileExists);
+
 protected:
 	queue<std::string> messages;
-        string s;
+        string request;
+        string response;
 };
 
-#endif // CALCFRAMER_HPP
+#endif // HTTPFRAMER_HPP

@@ -3,8 +3,8 @@
 #include <unistd.h>     /* for close() */
 #include <iostream>
 #include <assert.h>
-#include "CalcFramer.hpp"
-#include "CalcParser.hpp"
+#include "HttpFramer.hpp"
+#include "HttpParser.hpp"
 #include "DieWithError.h"
 #include "HandleTCPClient.h"
 #include <string>
@@ -22,7 +22,7 @@ void HandleTCPClient(int clntSocket, string doc_root)
 
     buffer[numBytesRcvd] = '\0';
     string s;
-    CalcFramer framer;
+    HttpFramer framer;
     string res;
     s = buffer;
 
@@ -31,7 +31,7 @@ void HandleTCPClient(int clntSocket, string doc_root)
       while (framer.hasMessage()) {
         string line = framer.topMessage();
         framer.popMessage();
-        pair<string, string> p = CalcParser::parse(line);
+        pair<string, string> p = HttpParser::parse(line);
         request[p.first] = p.second;
       }
       numBytesRcvd = recv(clntSocket, buffer, BUFSIZE - 1, 0);

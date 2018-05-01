@@ -1,12 +1,14 @@
 #include <assert.h>
-#include "CalcFramer.hpp"
+#include "HttpFramer.hpp"
 #include <queue>
 #include <string>
 #include <iostream>
 
+// TO modify and impl
+
 using namespace std;
 
-void CalcFramer::append(string chars)
+void HttpFramer::append(string chars)
 {
         s.append(chars);
 	size_t start = 0;
@@ -21,22 +23,22 @@ void CalcFramer::append(string chars)
         s = s.substr(start, s.size() - start);
 }
 
-bool CalcFramer::hasMessage() const
+bool HttpFramer::hasMessage() const
 {
 	return !messages.empty();
 }
 
-string CalcFramer::topMessage() const
+string HttpFramer::topMessage() const
 {
 	return messages.front();
 }
 
-void CalcFramer::popMessage()
+void HttpFramer::popMessage()
 {
 	messages.pop();
 }
 
-void CalcFramer::printToStream(ostream& stream) const
+void HttpFramer::printToStream(ostream& stream) const
 {
         queue<string> copy = messages;
 	while (!copy.empty()) {
