@@ -6,4 +6,4 @@ Starter code copyright (c) 2017, 2018 George Porter.  All Rights Reserved.
 
 ## To build
 
-Then design is written in the document.
+The design is written in the document.
