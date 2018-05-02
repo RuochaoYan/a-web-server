@@ -120,7 +120,7 @@ void requestProcessing(HttpRequest req, int clntSocket, HttpFramer framer, strin
     
     // check if the headers are valid - 400
     for(auto it = req.headers.cbegin(); it != req.headers.cend(); it++){
-        if(it->first[it->first.size()-1] != ':'){
+        if(it->first[it->first.size()-1] != ':' || it->second.size() == 0){
             response.status_code = 400;
             prepareResponse(clntSocket, response, framer);
         }
@@ -129,7 +129,7 @@ void requestProcessing(HttpRequest req, int clntSocket, HttpFramer framer, strin
     // other status code
     if(response.status_code != 400){
         // check if the initial line is valid
-        if(req.method.size() == 0 ||req.url.size() == 0 || req.version.size() == 0 || req.headers.find("Host:") == req.headers.end() || req.version[0] == ' ' || req.url[0] == ' '){
+        if(req.method != "GET" ||req.url.size() == 0 || req.version.size() == 0 || req.headers.find("Host:") == req.headers.end() || req.version[0] == ' ' || req.url[0] == ' ' || req.version[req.version.size() - 1] == ' ' || req.url[req.url.size() - 1] == ' '){
             response.status_code = 400;
         }
         // check if it is a malformed url - 404
@@ -169,7 +169,6 @@ void HandleTCPClient(int clntSocket, string doc_root)
     HttpFramer framer;
     string res;
     s = buffer;
-    
     HttpRequest req;
 
     while (numBytesRcvd > 0) {

@@ -58,9 +58,22 @@ void start_httpd(unsigned short port, string doc_root)
                                &clntLen)) < 0)
             DieWithError("accept() failed");
 
+        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
+
+        struct timeval timeout;      
+        timeout.tv_sec = 5;
+        timeout.tv_usec = 0;
+
+        if (setsockopt (clntSock, SOL_SOCKET, SO_RCVTIMEO, (char *)&timeout,
+                sizeof(timeout)) < 0)
+           DieWithError("setsockopt failed\n");
+
+        if (setsockopt (clntSock, SOL_SOCKET, SO_SNDTIMEO, (char *)&timeout,
+                sizeof(timeout)) < 0)
+           DieWithError("setsockopt failed\n");
+
         /* clntSock is connected to a client! */
 
-        printf("Handling client %s\n", inet_ntoa(echoClntAddr.sin_addr));
 
         struct ThreadArgs *threadArgs = (struct ThreadArgs *) malloc(sizeof(struct ThreadArgs));
         if (threadArgs == NULL)
@@ -72,7 +85,6 @@ void start_httpd(unsigned short port, string doc_root)
         int returnValue = pthread_create(&threadID, NULL, ThreadMain, threadArgs);
         if (returnValue != 0)
           DieWithError("pthread_create() failed");
-	printf("with thread %lu\n", (unsigned long int) threadID);
     }
     /* NOT REACHED */
 }
