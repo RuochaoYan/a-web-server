@@ -11,7 +11,7 @@ using namespace std;
 
 vector<string> HttpParser::parseRequest(string insstr)
 {
-    vector<string> v;
+    vector<string> v;    
     stringstream ss(insstr);
     string item;
     getline(ss, item, ' ');

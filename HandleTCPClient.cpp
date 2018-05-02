@@ -129,7 +129,7 @@ void requestProcessing(HttpRequest req, int clntSocket, HttpFramer framer, strin
     // other status code
     if(response.status_code != 400){
         // check if the initial line is valid
-        if(req.method != "GET" ||req.url.size() == 0 || req.version.size() == 0 || req.headers.find("Host:") == req.headers.end() || req.version[0] == ' ' || req.url[0] == ' ' || req.version[req.version.size() - 1] == ' ' || req.url[req.url.size() - 1] == ' '){
+        if(req.method != "GET" ||req.url.size() == 0 || req.version.size() == 0 || req.headers.find("Host:") == req.headers.end() || req.url[0] == ' ' || req.url[req.url.size() - 1] == ' ' || req.version != "HTTP/1.1"){
             response.status_code = 400;
         }
         // check if it is a malformed url - 404
